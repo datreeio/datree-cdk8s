@@ -1,5 +1,5 @@
 {
-  "name": "@datreeio/cdk8s-plugin",
+  "name": "@datreeio/datree-cdk8s",
   "version": "0.0.0-development",
   "description": "a plugin to validate cdk8s",
   "main": "build/index.js",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/datreeio/cdk8s-plugin.git"
+    "url": "https://github.com/datreeio/datree-cdk8s.git"
   },
   "publishConfig": {
     "access": "restricted"
