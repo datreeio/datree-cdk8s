@@ -7,12 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16.x"
-          registry-url: "https://www.npmjs.com/package/@datreeio/cdk8s-plugin"
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3.4.1
+      # - name: SSH Remote Commands
+      #   uses: appleboy/ssh-action@v0.1.5
       - run: npm ci
-      - run: npm test
+      - run: npm run build
+      # - run: npm test
       - name: Action For Semantic Release
         uses: cycjimmy/semantic-release-action@v3.0.0
         env:
