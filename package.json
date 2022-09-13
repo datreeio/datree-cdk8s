@@ -1,0 +1,15 @@
+{
+  "name": "@datreeio/cdk8s-plugin",
+  "version": "1.0.0",
+  "description": "a plugin to validate cdk8s",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.8.3"
+  }
+}
