@@ -1,15 +1,26 @@
 {
   "name": "@datreeio/cdk8s-plugin",
-  "version": "1.0.1",
+  "version": "0.0.0-development",
   "description": "a plugin to validate cdk8s",
   "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "npm run build && semantic-release && npm publish",
+    "semantic-release": "semantic-release"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.3",
+    "semantic-release": "^19.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/datreeio/cdk8s-plugin.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }

@@ -1,0 +1,20 @@
+name: Publish Package to npmjs
+on:
+  push:
+    branches: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          registry-url: "https://www.npmjs.com/package/@datreeio/cdk8s-plugin"
+      - run: npm ci
+      - run: npm test
+      - name: Action For Semantic Release
+        uses: cycjimmy/semantic-release-action@v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
