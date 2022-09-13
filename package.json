@@ -7,7 +7,7 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "release": "npm run build && semantic-release && npm publish",
-    "semantic-release": "semantic-release --branches main"
+    "semantic-release": "semantic-release"
   },
   "keywords": [],
   "author": "",
@@ -22,5 +22,10 @@
   },
   "publishConfig": {
     "access": "restricted"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
   }
 }
