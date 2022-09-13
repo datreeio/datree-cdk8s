@@ -1,6 +1,6 @@
 {
   "name": "@datreeio/cdk8s-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a plugin to validate cdk8s",
   "main": "build/index.js",
   "scripts": {
