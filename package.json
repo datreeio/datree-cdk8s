@@ -16,17 +16,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "7zip": "^0.0.6",
     "axios": "^0.27.2",
     "extract-zip": "^2.0.1",
-    "node-stream-zip": "^1.15.0",
     "np": "^7.6.2",
     "request": "^2.88.2",
     "watch": "^1.0.2"
   },
   "devDependencies": {
     "semantic-release": "^19.0.5",
-    "typescript": "^4.8.3"
+    "typescript": "^4.8.3",
+    "cdk8s": "^2.4.8",
+    "cdk8s-cli": "^2.0.103",
+    "cdk8s-plus-24": "^2.0.0-rc.92",
+    "constructs": "^10.1.90"
   },
   "repository": {
     "type": "git",

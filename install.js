@@ -95,13 +95,10 @@ async function unzipDatreeInDir() {
   console.log('🌳 Unzipping datree...');
   const absolutePath = `${process.cwd()}`;
   try {
-    const extractDatreeZip = await extract(
-      `${absolutePath}${TARGET_FILE_PATH}`,
-      {
-        dir: `${absolutePath}/bin`,
-      }
-    );
-    console.log('🌳 datree unzipped successfully', extractDatreeZip);
+    await extract(`${absolutePath}${TARGET_FILE_PATH}`, {
+      dir: `${absolutePath}/bin`,
+    });
+    console.log('🌳 datree unzipped successfully');
   } catch (error) {
     throw new Error(`🌳 Failed to get unzip datree in dir: ${error}`);
   }
