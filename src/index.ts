@@ -1,14 +1,10 @@
 import { spawnSync } from 'child_process';
-import type {
-  Validation,
-  ValidationContext,
-  ValidationViolatingResource,
-} from 'cdk8s-cli/lib/plugins';
+
 export interface DatreeValidationProps {
   readonly policy?: string;
 }
 
-export class DatreeValidation implements Validation {
+export class DatreeValidation {
   private readonly props: DatreeValidationProps;
   private policy: string = 'Default';
 
@@ -19,11 +15,11 @@ export class DatreeValidation implements Validation {
     }
   }
 
-  public async validate(context: ValidationContext) {
-    const violatingResources: ValidationViolatingResource[] = [];
+  public async validate(context: any) {
+    const violatingResources: any[] = [];
 
     for (const manifest of context.manifests) {
-      context.logger.log(`validating manifest: ${manifest}`);
+      context.logger.log(`validating manifestt: ${manifest}`);
       const datreeOutput = spawnSync(
         `./bin/datree`,
         ['test', manifest, '-o', 'json'],
