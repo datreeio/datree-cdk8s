@@ -8,6 +8,24 @@ const spawn = require('child_process').spawn;
 const BIN_PATH = './bin';
 const TARGET_FILE_PATH = `${BIN_PATH}/datree.zip`;
 
+// possible values: 'arm', 'arm64', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32', or 'x64'
+const mapDatreeAssets = {
+  darwin: {
+    arm64: 'darwin_arm64',
+    x86_64: 'darwin_x86_64',
+  },
+  linux: {
+    arm64: 'linux_arm64',
+    x86_64: 'linux_x86_64',
+    386: 'linux_386',
+    x64: 'linux_x86_64',
+  },
+  win32: {
+    386: 'windows_386',
+    x86_64: 'windows_x86_64',
+  },
+};
+
 async function getDatreeLatestRelease(datreeVersion) {
   const url = `https://api.github.com/repos/datreeio/datree/releases/tags/${datreeVersion}`;
   console.log(`🌳 Getting latest release from ${url}`);
@@ -21,11 +39,19 @@ async function getDatreeLatestRelease(datreeVersion) {
     });
     if (response.status === 200) {
       console.log(`🌳 Latest release: ${response.data.tag_name}`);
-      const platform = process.platform; //'aix','darwin','freebsd','linux','openbsd','sunos','win32
+      const platform = process.platform;
       const isWin = platform === 'win32';
-      let arch = process.arch; // 'arm', 'arm64', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32', or 'x64'
+      let arch = process.arch;
+
       console.log(`🌳 Platform: ${platform}`);
       console.log(`🌳 Arch: ${arch}`);
+
+      const assetName = mapDatreeAssets[platform][arch];
+      if (!assetName) {
+        throw new Error(`🌳 Unsupported platform: ${platform} ${arch}`);
+      }
+
+      console.log(`🌳 Asset name: ${assetName}`);
 
       if (isWin) {
         const child = spawn('powershell.exe', ['./windows/get_arch.ps1']);
@@ -37,15 +63,13 @@ async function getDatreeLatestRelease(datreeVersion) {
         });
         child.stdin.end();
       }
+
       const assets = response.data.assets;
 
       const matchUrl = assets.find((asset) => {
         const browser_download_url = asset.browser_download_url.toLowerCase();
         console.log(`🌳 Checking asset: ${browser_download_url}`);
-        return (
-          browser_download_url.includes(platform) &&
-          browser_download_url.includes(arch)
-        );
+        return browser_download_url.includes(assetName);
       });
       return matchUrl.browser_download_url;
     }
