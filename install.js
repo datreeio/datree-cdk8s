@@ -23,6 +23,7 @@ const mapDatreeAssets = {
   win32: {
     386: 'windows_386',
     x86_64: 'windows_x86_64',
+    x64: 'windows_x86_64',
   },
 };
 
