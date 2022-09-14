@@ -1,12 +1,11 @@
 const axios = require('axios').default;
 const fs = require('fs');
 const { pipeline } = require('stream/promises');
-const unzipper = require('unzipper');
+const extract = require('extract-zip');
 const pjson = require('./package.json');
 const spawn = require('child_process').spawn;
 
-const BIN_PATH = './bin';
-const TARGET_FILE_PATH = `${BIN_PATH}/datree.zip`;
+const TARGET_FILE_PATH = `/bin/datree.zip`;
 
 // possible values: 'arm', 'arm64', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32', or 'x64'
 const mapDatreeAssets = {
@@ -86,29 +85,23 @@ async function downloadFile(url, targetFile) {
     responseType: 'stream',
   });
 
-  const writeStream = fs.createWriteStream(targetFile);
+  const writeStream = fs.createWriteStream(`./${targetFile}`);
   await pipeline(response.data, writeStream);
 
   return response.status;
 }
 
-async function unzipDatreeInDir(targetFile) {
+async function unzipDatreeInDir() {
   console.log('🌳 Unzipping datree...');
-
+  const absolutePath = `${process.cwd()}`;
   try {
-    const unzipResult = await fs
-      .createReadStream(targetFile)
-      .pipe(unzipper.Extract({ path: BIN_PATH }))
-      .promise('close');
-
-    const files = fs.readdirSync(BIN_PATH);
-    files.forEach((file) => {
-      if (file !== 'datree') {
-        fs.unlinkSync(`${BIN_PATH}/${file}`);
+    const extractDatreeZip = await extract(
+      `${absolutePath}${TARGET_FILE_PATH}`,
+      {
+        dir: `${absolutePath}/bin`,
       }
-    });
-
-    return unzipResult;
+    );
+    console.log('🌳 datree unzipped successfully', extractDatreeZip);
   } catch (error) {
     throw new Error(`🌳 Failed to get unzip datree in dir: ${error}`);
   }
