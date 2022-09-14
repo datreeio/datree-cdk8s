@@ -21,9 +21,9 @@ async function getDatreeLatestRelease(datreeVersion) {
     });
     if (response.status === 200) {
       console.log(`🌳 Latest release: ${response.data.tag_name}`);
-      const platform = process.platform;
+      const platform = process.platform; //'aix','darwin','freebsd','linux','openbsd','sunos','win32
       const isWin = platform === 'win32';
-      let arch = process.arch;
+      let arch = process.arch; // 'arm', 'arm64', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32', or 'x64'
       console.log(`🌳 Platform: ${platform}`);
       console.log(`🌳 Arch: ${arch}`);
 
@@ -41,6 +41,7 @@ async function getDatreeLatestRelease(datreeVersion) {
 
       const matchUrl = assets.find((asset) => {
         const browser_download_url = asset.browser_download_url.toLowerCase();
+        console.log(`🌳 Checking asset: ${browser_download_url}`);
         return (
           browser_download_url.includes(platform) &&
           browser_download_url.includes(arch)
