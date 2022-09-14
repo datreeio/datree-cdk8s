@@ -24,6 +24,8 @@ async function getDatreeLatestRelease(datreeVersion) {
       const platform = process.platform;
       const isWin = platform === 'win32';
       let arch = process.arch;
+      console.log(`🌳 Platform: ${platform}`);
+      console.log(`🌳 Arch: ${arch}`);
 
       if (isWin) {
         const child = spawn('powershell.exe', ['./windows/get_arch.ps1']);
@@ -36,9 +38,9 @@ async function getDatreeLatestRelease(datreeVersion) {
         child.stdin.end();
       }
       const assets = response.data.assets;
+
       const matchUrl = assets.find((asset) => {
         const browser_download_url = asset.browser_download_url.toLowerCase();
-        console.log(`🌳 Checking ${browser_download_url}`);
         return (
           browser_download_url.includes(platform) &&
           browser_download_url.includes(arch)
