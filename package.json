@@ -5,11 +5,11 @@
   "description": "a plugin to validate cdk8s",
   "main": "build/index.js",
   "scripts": {
+    "postinstall": "node ./install.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "release": "npm run build && semantic-release && npm publish",
-    "semantic-release": "semantic-release",
-    "install-datree": "node ./install.js"
+    "semantic-release": "semantic-release"
   },
   "keywords": [],
   "author": "",
