@@ -9,8 +9,8 @@ const BIN_PATH = './bin';
 const TARGET_FILE_PATH = `${BIN_PATH}/datree.zip`;
 
 async function getDatreeLatestRelease(datreeVersion) {
-  console.log('🌳 Getting latest release...');
   const url = `https://api.github.com/repos/datreeio/datree/releases/tags/${datreeVersion}`;
+  console.log(`🌳 Getting latest release from ${url}`);
 
   try {
     const response = await axios.get(url, {
