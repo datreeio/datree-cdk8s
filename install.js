@@ -19,7 +19,7 @@ async function getDatreeLatestRelease(datreeVersion) {
         Accept: 'application/vnd.github.v3+json',
       },
     });
-
+    console.log('1', response);
     if (response.status === 200) {
       console.log(`🌳 Latest release: ${response.data.tag_name}`);
       const platform = process.platform;
@@ -36,8 +36,9 @@ async function getDatreeLatestRelease(datreeVersion) {
         });
         child.stdin.end();
       }
-
+      console.log('2', response);
       const assets = response.data.assets;
+      console.log('3', assets);
       const matchUrl = assets.find((asset) => {
         const browser_download_url = asset.browser_download_url.toLowerCase();
         return (
