@@ -1,4 +1,5 @@
-import { spawnSync } from 'child_process';
+import { sync } from 'cross-spawn';
+
 import type {
   Validation,
   ValidationContext,
@@ -24,22 +25,22 @@ export class DatreeValidation implements Validation {
     const violatingResources: ValidationViolatingResource[] = [];
 
     for (const manifest of context.manifests) {
-      context.logger.log(`validating manifest: ${manifest}`);
+      context.logger.log(`🌳 Datree validating ${manifest}`);
       // TODO: after installing datree, we need to run binary from absolute path
-      const datreeOutput = spawnSync(
+      const { status, output } = sync(
         `datree`,
-        ['test', manifest, '-o', 'json', '-p', this.policy, '--verbose'],
+        ['test', manifest, '-p', this.policy, '-o', 'json', '--verbose'],
         {
           encoding: 'utf-8',
           stdio: 'pipe',
         }
       );
 
-      let parseOutput = datreeOutput.output?.map((output) => {
-        if (output) {
-          return JSON.parse(decodeURIComponent(output));
-        }
-      });
+      // let parseOutput = ?.map((output) => {
+      //   if (output) {
+      //     return JSON.parse(decodeURIComponent(output));
+      //   }
+      // });
 
       // TODO: parse data to match the ouput https://github.com/cdk8s-team/cdk8s/blob/epolon/manifest-validation/docs/cli/synth.md#private-validation-plugins
       // TODO: report violations example:
