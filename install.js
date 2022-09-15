@@ -40,7 +40,6 @@ async function getDatreeLatestRelease(datreeVersion) {
     if (response.status === 200) {
       console.log(`🌳 Latest release: ${response.data.tag_name}`);
       const platform = process.platform;
-      const isWin = platform === 'win32';
       let arch = process.arch;
 
       console.log(`🌳 Platform: ${platform}`);
@@ -52,17 +51,6 @@ async function getDatreeLatestRelease(datreeVersion) {
       }
 
       console.log(`🌳 Asset name: ${assetName}`);
-
-      if (isWin) {
-        const child = spawn('powershell.exe', ['./windows/get_arch.ps1']);
-        child.stdout.on('data', function (data) {
-          arch = data;
-        });
-        child.stderr.on('data', function (data) {
-          throw new Error(data);
-        });
-        child.stdin.end();
-      }
 
       const assets = response.data.assets;
 
