@@ -1,14 +1,23 @@
 import { sync } from 'cross-spawn';
+import fs from 'fs';
 
 import type {
   Validation,
   ValidationContext,
   ValidationViolatingResource,
+  ValidationViolation,
 } from 'cdk8s-cli/lib/plugins';
 
 export interface DatreeValidationProps {
   readonly policy?: string;
 }
+
+export type DatreeAddViolation = {
+  readonly ruleName: string;
+  readonly recommendation: string;
+  readonly fix: string;
+  readonly violatingResources: ValidationViolatingResource[];
+};
 
 export class DatreeValidation implements Validation {
   private readonly props: DatreeValidationProps;
@@ -36,22 +45,46 @@ export class DatreeValidation implements Validation {
         }
       );
 
-      // let parseOutput = ?.map((output) => {
-      //   if (output) {
-      //     return JSON.parse(decodeURIComponent(output));
-      //   }
-      // });
+      if (status === 2) {
+        const policyValidationResult: any = {};
+        output.forEach((o) => {
+          if (!!o) {
+            const parsed = JSON.parse(o);
+            const fileName = parsed.policyValidationResults[0].fileName;
+            const ruleResults = parsed.policyValidationResults[0].ruleResults;
+            policyValidationResult[fileName] = ruleResults;
+          }
+        });
+        let newDatreeViolations: DatreeAddViolation[] = [];
+        for (const [fileName, ruleResults] of Object.entries(
+          policyValidationResult
+        )) {
+          newDatreeViolations = newDatreeViolations.concat(
+            (ruleResults as any).map((ruleResult: any) => {
+              let prepViolation: ValidationViolation = {
+                ruleName: ruleResult.name,
+                recommendation: ruleResult.messageOnFailure,
+                fix: ruleResult.documentationUrl,
+                violatingResources: [] as any,
+              };
 
-      // TODO: parse data to match the ouput https://github.com/cdk8s-team/cdk8s/blob/epolon/manifest-validation/docs/cli/synth.md#private-validation-plugins
-      // TODO: report violations example:
-      // context.report.addViolation({
-      //   ruleName:
-      //     'Ensure deployment-like resource is using a valid restart policy',
-      //   recommendation:
-      //     'Incorrect value for key `restartPolicy` - any other value than `Always` is not supported by this resource',
-      //   violatingResources: violatingResources,
-      //   fix: 'https://hub.datree.io/built-in-rules/ensure-valid-restart-policy',
-      // });
+              ruleResult.occurrencesDetails.forEach((occurrence: any) => {
+                const { schemaPath, failedErrorLine, failedErrorColumn } =
+                  occurrence.failureLocations[0];
+                console.log(occurrence.metadataName);
+                prepViolation.violatingResources.push({
+                  resourceName: occurrence.metadataName,
+                  locations: [
+                    `key: ${schemaPath} (line: ${failedErrorLine}:${failedErrorColumn})`,
+                  ],
+                  manifestPath: fileName,
+                });
+              });
+              context.report.addViolation(prepViolation);
+            })
+          );
+        }
+      }
     }
 
     context.report.submit(
