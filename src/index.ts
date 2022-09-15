@@ -71,10 +71,11 @@ export class DatreeValidation implements Validation {
               ruleResult.occurrencesDetails.forEach((occurrence: any) => {
                 const { schemaPath, failedErrorLine, failedErrorColumn } =
                   occurrence.failureLocations[0];
+                const path = schemaPath ? schemaPath.substring(1) : '';
                 prepViolation.violatingResources.push({
-                  resourceName: `${fileName}/${occurrence.kind}`,
+                  resourceName: occurrence.metadataName,
                   locations: [
-                    `key: ${schemaPath} (line: ${failedErrorLine}:${failedErrorColumn})`,
+                    `key: ${path} (line: ${failedErrorLine}:${failedErrorColumn})`,
                   ],
                   manifestPath: fileName,
                 });
@@ -89,7 +90,7 @@ export class DatreeValidation implements Validation {
     context.report.submit(
       violatingResources.length > 0 ? 'failure' : 'success',
       {
-        'Customize\npolicy\n':
+        'Customize\npolicy':
           'https://app.datree.io/login?t=h49sD9cAHvyhxVzEJ3oajb&p=cdk8s',
       }
     );
