@@ -71,9 +71,8 @@ export class DatreeValidation implements Validation {
               ruleResult.occurrencesDetails.forEach((occurrence: any) => {
                 const { schemaPath, failedErrorLine, failedErrorColumn } =
                   occurrence.failureLocations[0];
-                console.log(occurrence.metadataName);
                 prepViolation.violatingResources.push({
-                  resourceName: occurrence.metadataName,
+                  resourceName: `${fileName}/${occurrence.kind}`,
                   locations: [
                     `key: ${schemaPath} (line: ${failedErrorLine}:${failedErrorColumn})`,
                   ],
