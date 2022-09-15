@@ -36,7 +36,7 @@ validations:
 ```
 
 ## Customization
-To use a different Datree policy, change the value of the `policy` key in your configuration file:
+You can use any policy in your [Datree account](https://app.datree.io) for your checks, simply change the value of the `policy` key in your configuration file to the name of your desired policy:
 ```
 properties:
   - policy: default
