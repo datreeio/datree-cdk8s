@@ -1,15 +1,17 @@
 import { spawnSync } from 'child_process';
-// TODO: fix import on ci , it works locally. missing cdk8s-cli/plugins---> cdk8s-cli/bin/plugins
-// import type { Validation, ValidationContext, ValidationViolatingResource } from 'cdk8s-cli/plugins';
+import type {
+  Validation,
+  ValidationContext,
+  ValidationViolatingResource,
+} from 'cdk8s-cli/lib/plugins';
 
 export interface DatreeValidationProps {
   readonly policy?: string;
 }
 
-// implements Validation
-export class DatreeValidation {
+export class DatreeValidation implements Validation {
   private readonly props: DatreeValidationProps;
-  private policy: string = 'Default';
+  private policy: string = 'cdk8s';
 
   constructor(props: DatreeValidationProps = {}) {
     this.props = props;
@@ -17,16 +19,15 @@ export class DatreeValidation {
       this.policy = props.policy;
     }
   }
-  // TODO: context type is ValidationContext
-  public async validate(context: any) {
-    // const violatingResources: ValidationViolatingResource[] = [];
-    const violatingResources: any[] = [];
+
+  public async validate(context: ValidationContext) {
+    const violatingResources: ValidationViolatingResource[] = [];
 
     for (const manifest of context.manifests) {
-      context.logger.log(`validating manifestt: ${manifest}`);
+      context.logger.log(`validating manifest: ${manifest}`);
       // TODO: after installing datree, we need to run binary from absolute path
       const datreeOutput = spawnSync(
-        `/Users/shmuel/.cdk8s/plugins/@datreeio/datree-cdk8s/1.2.3/node_modules/@datreeio/datree-cdk8s/bin/datree`,
+        `datree`,
         ['test', manifest, '-o', 'json', '-p', this.policy, '--verbose'],
         {
           encoding: 'utf-8',
