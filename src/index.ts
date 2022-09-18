@@ -1,12 +1,13 @@
-import { sync } from 'cross-spawn';
-import fs from 'fs';
+import { sync } from "cross-spawn";
+import fs from "fs";
+import path from "path";
 
 import type {
   Validation,
   ValidationContext,
   ValidationViolatingResource,
   ValidationViolation,
-} from 'cdk8s-cli/lib/plugins';
+} from "cdk8s-cli/lib/plugins";
 
 export interface DatreeValidationProps {
   readonly policy?: string;
@@ -21,7 +22,7 @@ export type DatreeAddViolation = {
 
 export class DatreeValidation implements Validation {
   private readonly props: DatreeValidationProps;
-  private policy: string = 'cdk8s';
+  private policy: string = "cdk8s";
 
   constructor(props: DatreeValidationProps = {}) {
     this.props = props;
@@ -33,15 +34,20 @@ export class DatreeValidation implements Validation {
   public async validate(context: ValidationContext) {
     const policyValidationResult: Map<string, any[]> = new Map();
 
+    const binFilePath = path.resolve(__dirname, "..", "bin", "datree");
+    if (!fs.existsSync(binFilePath)) {
+      throw new Error(`Datree binary not found at ${binFilePath}`);
+    }
+
     for (const manifest of context.manifests) {
       context.logger.log(`🌳 Datree validating ${manifest}`);
 
       const { status, output } = sync(
-        `datree`,
-        ['test', manifest, '-p', this.policy, '-o', 'json', '--verbose'],
+        binFilePath,
+        ["test", manifest, "-p", this.policy, "-o", "json", "--verbose"],
         {
-          encoding: 'utf-8',
-          stdio: 'pipe',
+          encoding: "utf-8",
+          stdio: "pipe",
         }
       );
 
@@ -125,10 +131,10 @@ export class DatreeValidation implements Validation {
     }
 
     context.report.submit(
-      policyValidationResult.size > 0 ? 'failure' : 'success',
+      policyValidationResult.size > 0 ? "failure" : "success",
       {
-        'Customize\npolicy':
-          'https://app.datree.io/login?t=h49sD9cAHvyhxVzEJ3oajb&p=cdk8s',
+        "Customize\npolicy":
+          "https://app.datree.io/login?t=h49sD9cAHvyhxVzEJ3oajb&p=cdk8s",
       }
     );
   }
