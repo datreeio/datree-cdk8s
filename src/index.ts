@@ -13,10 +13,12 @@ export interface DatreeValidationProps {
 }
 
 export type DatreeAddViolation = {
-  readonly ruleName: string;
-  readonly recommendation: string;
-  readonly fix: string;
-  readonly violatingResources: ValidationViolatingResource[];
+  [ruleName: string]: {
+    readonly ruleName: string;
+    readonly recommendation: string;
+    readonly fix: string;
+    readonly violatingResources: ValidationViolatingResource[]; // { resourceName: string; locations: string[]; manifestPath: string; } == occurrences []
+  };
 };
 
 export class DatreeValidation implements Validation {
@@ -61,6 +63,7 @@ export class DatreeValidation implements Validation {
         )) {
           newDatreeViolations = newDatreeViolations.concat(
             (ruleResults as any).map((ruleResult: any) => {
+              console.log(fileName, ruleResults);
               let prepViolation: ValidationViolation = {
                 ruleName: ruleResult.name,
                 recommendation: ruleResult.messageOnFailure,
