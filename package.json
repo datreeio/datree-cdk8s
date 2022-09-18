@@ -1,7 +1,7 @@
 {
   "name": "@datreeio/datree-cdk8s",
   "version": "0.0.0-development",
-  "datree_version": "1.6.29",
+  "datree_version": "1.6.33",
   "description": "a plugin to validate cdk8s",
   "main": "build/index.js",
   "scripts": {

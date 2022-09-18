@@ -23,6 +23,7 @@ export type DatreeAddViolation = {
 export class DatreeValidation implements Validation {
   private readonly props: DatreeValidationProps;
   private policy: string = 'cdk8s';
+  private loginUrl: string = 'https://app.datree.io/login';
 
   constructor(props: DatreeValidationProps = {}) {
     this.props = props;
@@ -67,6 +68,7 @@ export class DatreeValidation implements Validation {
             const parsed = JSON.parse(o);
             const fileName = parsed.policyValidationResults[0].fileName;
             const ruleResults = parsed.policyValidationResults[0].ruleResults;
+            this.loginUrl = parsed.loginUrl;
             ruleResults.forEach((ruleResult: any) => {
               const violation = {
                 fileName: fileName,
@@ -143,8 +145,7 @@ export class DatreeValidation implements Validation {
     context.report.submit(
       policyValidationResult.size > 0 ? 'failure' : 'success',
       {
-        'Customize\npolicy':
-          'https://app.datree.io/login?t=h49sD9cAHvyhxVzEJ3oajb&p=cdk8s',
+        'Customize\npolicy': this.loginUrl,
       }
     );
   }
