@@ -11,7 +11,7 @@ This plugin allows you to run automatic policy checks against synthesized manife
 
 ## Specification
 cdk8s plugins come in the form of NPM packages.  
-When specified in the configuration file, the cdk8s cli will automatically install and run a plugin. See the `Usage` section for instructions.
+When specified in the configuration file, the cdk8s cli will automatically install and run a plugin. See the `Usage` section below for instructions.
 
 ## Prerequisites
 To use this plugin, the [cdk8s cli](https://github.com/cdk8s-team/cdk8s-cli#a-command-line-interface-for-cdk-for-kubernetes) needs to be installed.
@@ -28,7 +28,7 @@ To use this plugin, your configuration file should look like this:
 language: typescript
 app: ts-node main.ts
 validations:
-  - package: datree-cdk8s-plugin
+  - package: @datreeio/datree-cdk8s
     class: DatreeValidation
     version: 0.0.1
     properties:
