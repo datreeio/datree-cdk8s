@@ -31,11 +31,11 @@ export class DatreeValidation implements Validation {
   }
 
   public async validate(context: ValidationContext) {
-    const violatingResources: ValidationViolatingResource[] = [];
+    const policyValidationResult: Map<string, any[]> = new Map();
 
     for (const manifest of context.manifests) {
       context.logger.log(`🌳 Datree validating ${manifest}`);
-      // TODO: after installing datree, we need to run binary from absolute path
+
       const { status, output } = sync(
         `datree`,
         ['test', manifest, '-p', this.policy, '-o', 'json', '--verbose'],
@@ -46,50 +46,88 @@ export class DatreeValidation implements Validation {
       );
 
       if (status === 2) {
-        const policyValidationResult: any = {};
         output.forEach((o) => {
           if (!!o) {
             const parsed = JSON.parse(o);
             const fileName = parsed.policyValidationResults[0].fileName;
             const ruleResults = parsed.policyValidationResults[0].ruleResults;
-            policyValidationResult[fileName] = ruleResults;
-          }
-        });
-        let newDatreeViolations: DatreeAddViolation[] = [];
-        for (const [fileName, ruleResults] of Object.entries(
-          policyValidationResult
-        )) {
-          newDatreeViolations = newDatreeViolations.concat(
-            (ruleResults as any).map((ruleResult: any) => {
-              let prepViolation: ValidationViolation = {
-                ruleName: ruleResult.name,
+            ruleResults.forEach((ruleResult: any) => {
+              const violation = {
+                fileName: fileName,
+                ruleName: ruleResult.identifier,
+                name: ruleResult.name,
                 recommendation: ruleResult.messageOnFailure,
                 fix: ruleResult.documentationUrl,
-                violatingResources: [] as any,
+                occurrences: ruleResult.occurrencesDetails,
               };
-
-              ruleResult.occurrencesDetails.forEach((occurrence: any) => {
-                const { schemaPath, failedErrorLine, failedErrorColumn } =
-                  occurrence.failureLocations[0];
-                prepViolation.violatingResources.push({
-                  resourceName: `${fileName}/${occurrence.kind}`,
-                  locations: [
-                    `key: ${schemaPath} (line: ${failedErrorLine}:${failedErrorColumn})`,
-                  ],
-                  manifestPath: fileName,
-                });
-              });
-              context.report.addViolation(prepViolation);
-            })
-          );
-        }
+              if (policyValidationResult.has(violation.ruleName)) {
+                policyValidationResult.get(violation.ruleName)?.push(violation);
+              } else {
+                policyValidationResult.set(violation.ruleName, [violation]);
+              }
+            });
+          }
+        });
       }
     }
 
+    if (policyValidationResult.size > 0) {
+      let violationsMap: Map<string, any[]> = new Map();
+      policyValidationResult.forEach((violations: any) => {
+        violations.forEach((violation: any) => {
+          const violatingResources: ValidationViolatingResource[] = [];
+          const fileName = violation.fileName;
+          const ruleName = violation.ruleName;
+          violation.occurrences.forEach((occurrence: any) => {
+            violatingResources.push({
+              resourceName: occurrence.metadataName,
+              locations: occurrence.failureLocations.map(
+                (l: any) =>
+                  `${l.schemaPath.substring(1)} (line: ${l.failedErrorLine}:${
+                    l.failedErrorColumn
+                  })`
+              ),
+              manifestPath: fileName,
+            });
+          });
+
+          let prepViolation = {
+            uniqueRuleName: ruleName,
+            name: fileName,
+            ruleName: violation.name,
+            recommendation: violation.recommendation,
+            fix: violation.fix,
+            violatingResources: violatingResources,
+          };
+
+          if (violationsMap.get(prepViolation.uniqueRuleName)) {
+            violationsMap
+              .get(prepViolation.uniqueRuleName)
+              ?.push(prepViolation);
+          } else {
+            violationsMap.set(prepViolation.uniqueRuleName, [prepViolation]);
+          }
+        });
+      });
+
+      violationsMap.forEach((e) => {
+        const mergeViolatingResources = e.reduce(
+          (acc, curr) => acc.concat(curr.violatingResources),
+          []
+        );
+        context.report.addViolation({
+          ruleName: e[0].ruleName,
+          recommendation: e[0].recommendation,
+          fix: e[0].fix,
+          violatingResources: mergeViolatingResources,
+        } as ValidationViolation);
+      });
+    }
+
     context.report.submit(
-      violatingResources.length > 0 ? 'failure' : 'success',
+      policyValidationResult.size > 0 ? 'failure' : 'success',
       {
-        'Customize\npolicy\n':
+        'Customize\npolicy':
           'https://app.datree.io/login?t=h49sD9cAHvyhxVzEJ3oajb&p=cdk8s',
       }
     );
