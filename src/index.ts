@@ -100,6 +100,10 @@ export class DatreeValidation implements Validation {
             context.logger.log(`🌳 Datree validation failed: ${error}`);
           }
         });
+      } else {
+        let errorString = output.toString();
+        errorString = errorString.replace(/[\n\r]+/g, ' ');
+        throw new Error(errorString.trim().substring(1).slice(0, -1));
       }
     }
 

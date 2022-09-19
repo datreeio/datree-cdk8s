@@ -3,7 +3,6 @@ const fs = require('fs');
 const { pipeline } = require('stream/promises');
 const extract = require('extract-zip');
 const pjson = require('./package.json');
-const spawn = require('child_process').spawn;
 
 const TARGET_FILE_PATH = `/bin/datree.zip`;
 
