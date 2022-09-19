@@ -9,6 +9,14 @@ import type {
   ValidationViolation,
 } from 'cdk8s-cli/lib/plugins';
 
+import {
+  DatreeRawJsonOutputType,
+  RuleResultType,
+  ViolationType,
+  PrepViolationType,
+  OccurrencesDetail,
+} from './types';
+
 export interface DatreeValidationProps {
   readonly policy?: string;
 }
@@ -33,44 +41,43 @@ export class DatreeValidation implements Validation {
   }
 
   public async validate(context: ValidationContext) {
-    const policyValidationResult: Map<string, any[]> = new Map();
+    const policyValidationResult: Map<string, ViolationType[]> = new Map();
 
     const binFilePath = path.resolve(__dirname, '..', 'bin', 'datree');
+
     if (!fs.existsSync(binFilePath)) {
-      throw new Error(`Datree binary not found at ${binFilePath}`);
+      throw new Error(`🌳 Datree binary not found at ${binFilePath}`);
     }
 
     for (const manifest of context.manifests) {
       context.logger.log(`🌳 Datree validating ${manifest}`);
+      const datreeFlags = [
+        'test',
+        manifest,
+        '-p',
+        this.policy,
+        '-o',
+        'json',
+        '--verbose',
+        '--skip-validation',
+        'schema',
+      ];
 
-      const { status, output } = sync(
-        binFilePath,
-        [
-          'test',
-          manifest,
-          '-p',
-          this.policy,
-          '-o',
-          'json',
-          '--verbose',
-          '--skip-validation',
-          'schema',
-        ],
-        {
-          encoding: 'utf-8',
-          stdio: 'pipe',
-        }
-      );
+      const { status, output } = sync(binFilePath, datreeFlags, {
+        encoding: 'utf-8',
+        stdio: 'pipe',
+      });
 
       if (status === 2) {
-        output.forEach((o) => {
+        output.forEach((o: string | null) => {
           if (!!o) {
-            const parsed = JSON.parse(o);
+            const parsed: DatreeRawJsonOutputType = JSON.parse(o);
+            console.log(parsed.policyValidationResults);
             const fileName = parsed.policyValidationResults[0].fileName;
             const ruleResults = parsed.policyValidationResults[0].ruleResults;
             this.loginUrl = parsed.loginUrl;
-            ruleResults.forEach((ruleResult: any) => {
-              const violation = {
+            ruleResults.forEach((ruleResult: RuleResultType) => {
+              const violation: ViolationType = {
                 fileName: fileName,
                 ruleName: ruleResult.identifier,
                 name: ruleResult.name,
@@ -90,13 +97,13 @@ export class DatreeValidation implements Validation {
     }
 
     if (policyValidationResult.size > 0) {
-      let violationsMap: Map<string, any[]> = new Map();
+      const violationsMap: Map<string, PrepViolationType[]> = new Map();
       policyValidationResult.forEach((violations: any) => {
         violations.forEach((violation: any) => {
           const violatingResources: ValidationViolatingResource[] = [];
           const fileName = violation.fileName;
           const ruleName = violation.ruleName;
-          violation.occurrences.forEach((occurrence: any) => {
+          violation.occurrences.forEach((occurrence: OccurrencesDetail) => {
             violatingResources.push({
               resourceName: occurrence.metadataName,
               locations: occurrence.failureLocations.map(
@@ -109,7 +116,7 @@ export class DatreeValidation implements Validation {
             });
           });
 
-          let prepViolation = {
+          let prepViolation: PrepViolationType = {
             uniqueRuleName: ruleName,
             name: fileName,
             ruleName: violation.name,
@@ -128,11 +135,13 @@ export class DatreeValidation implements Validation {
         });
       });
 
-      violationsMap.forEach((e) => {
+      violationsMap.forEach((e: PrepViolationType[]) => {
         const mergeViolatingResources = e.reduce(
-          (acc, curr) => acc.concat(curr.violatingResources),
+          (acc, curr) =>
+            acc.concat(curr.violatingResources as ConcatArray<never>),
           []
         );
+
         context.report.addViolation({
           ruleName: e[0].ruleName,
           recommendation: e[0].recommendation,
