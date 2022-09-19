@@ -50,7 +50,9 @@ export class DatreeValidation implements Validation {
     }
 
     for (const manifest of context.manifests) {
-      context.logger.log(`🌳 Datree validating ${manifest}`);
+      context.logger.log(
+        `🌳 Datree validating ${manifest} with policy ${this.policy}`
+      );
       const datreeFlags = [
         'test',
         manifest,
