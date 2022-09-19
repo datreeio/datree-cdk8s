@@ -12,6 +12,7 @@ const mapDatreeAssets = {
   darwin: {
     arm64: 'darwin_arm64',
     x86_64: 'darwin_x86_64',
+    x64: 'darwin_x86_64',
   },
   linux: {
     arm64: 'linux_arm64',
