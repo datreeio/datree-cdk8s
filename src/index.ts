@@ -70,27 +70,32 @@ export class DatreeValidation implements Validation {
 
       if (status === 2) {
         output.forEach((o: string | null) => {
-          if (!!o) {
-            const parsed: DatreeRawJsonOutputType = JSON.parse(o);
-            console.log(parsed.policyValidationResults);
-            const fileName = parsed.policyValidationResults[0].fileName;
-            const ruleResults = parsed.policyValidationResults[0].ruleResults;
-            this.loginUrl = parsed.loginUrl;
-            ruleResults.forEach((ruleResult: RuleResultType) => {
-              const violation: ViolationType = {
-                fileName: fileName,
-                ruleName: ruleResult.identifier,
-                name: ruleResult.name,
-                recommendation: ruleResult.messageOnFailure,
-                fix: ruleResult.documentationUrl,
-                occurrences: ruleResult.occurrencesDetails,
-              };
-              if (policyValidationResult.has(violation.ruleName)) {
-                policyValidationResult.get(violation.ruleName)?.push(violation);
-              } else {
-                policyValidationResult.set(violation.ruleName, [violation]);
-              }
-            });
+          try {
+            if (!!o) {
+              const parsed: DatreeRawJsonOutputType = JSON.parse(o);
+              const fileName = parsed.policyValidationResults[0].fileName;
+              const ruleResults = parsed.policyValidationResults[0].ruleResults;
+              this.loginUrl = parsed.loginUrl;
+              ruleResults.forEach((ruleResult: RuleResultType) => {
+                const violation: ViolationType = {
+                  fileName: fileName,
+                  ruleName: ruleResult.identifier,
+                  name: ruleResult.name,
+                  recommendation: ruleResult.messageOnFailure,
+                  fix: ruleResult.documentationUrl,
+                  occurrences: ruleResult.occurrencesDetails,
+                };
+                if (policyValidationResult.has(violation.ruleName)) {
+                  policyValidationResult
+                    .get(violation.ruleName)
+                    ?.push(violation);
+                } else {
+                  policyValidationResult.set(violation.ruleName, [violation]);
+                }
+              });
+            }
+          } catch (error) {
+            context.logger.log(`🌳 Datree validation failed: ${error}`);
           }
         });
       }
