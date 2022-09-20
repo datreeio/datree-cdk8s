@@ -2,12 +2,12 @@ import { sync } from 'cross-spawn';
 import fs from 'fs';
 import path from 'path';
 
-import type {
-  Validation,
-  ValidationContext,
-  ValidationViolatingResource,
-  ValidationViolation,
-} from 'cdk8s-cli/lib/plugins';
+// import type {
+//   Validation,
+//   ValidationContext,
+//   ValidationViolatingResource,
+//   ValidationViolation,
+// } from 'cdk8s-cli/lib/plugins';
 
 import {
   DatreeRawJsonOutputType,
@@ -25,10 +25,11 @@ export type DatreeAddViolation = {
   readonly ruleName: string;
   readonly recommendation: string;
   readonly fix: string;
-  readonly violatingResources: ValidationViolatingResource[];
+  readonly violatingResources: any[];
+  // readonly violatingResources: ValidationViolatingResource[];
 };
-
-export class DatreeValidation implements Validation {
+// implements Validation
+export class DatreeValidation {
   private readonly props: DatreeValidationProps;
   private policy: string = 'cdk8s';
   private loginUrl: string = 'https://app.datree.io/login';
@@ -40,7 +41,7 @@ export class DatreeValidation implements Validation {
     }
   }
 
-  public async validate(context: ValidationContext) {
+  public async validate(context: any) {
     const policyValidationResult: Map<string, ViolationType[]> = new Map();
 
     const binFilePath = path.resolve(__dirname, '..', 'bin', 'datree');
@@ -111,7 +112,8 @@ export class DatreeValidation implements Validation {
       const violationsMap: Map<string, PrepViolationType[]> = new Map();
       policyValidationResult.forEach((violations: any) => {
         violations.forEach((violation: any) => {
-          const violatingResources: ValidationViolatingResource[] = [];
+          // const violatingResources: ValidationViolatingResource[] = [];
+          const violatingResources: any[] = [];
           const fileName = violation.fileName;
           const ruleName = violation.ruleName;
           violation.occurrences.forEach((occurrence: OccurrencesDetail) => {
@@ -158,7 +160,7 @@ export class DatreeValidation implements Validation {
           recommendation: e[0].recommendation,
           fix: e[0].fix,
           violatingResources: mergeViolatingResources,
-        } as ValidationViolation);
+        } as any); //as ValidationViolation
       });
     }
 

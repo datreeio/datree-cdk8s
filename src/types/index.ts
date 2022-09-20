@@ -1,4 +1,4 @@
-import { ValidationViolatingResource } from 'cdk8s-cli/lib/plugins';
+// import { ValidationViolatingResource } from 'cdk8s-cli/lib/plugins';
 
 export interface DatreeRawJsonOutputType {
   policyValidationResults: PolicyValidationResult[];
@@ -68,5 +68,6 @@ export interface PrepViolationType {
   ruleName: string;
   recommendation: string;
   fix: string;
-  violatingResources: ValidationViolatingResource[] | ConcatArray<never>;
+  violatingResources: any[] | ConcatArray<never>;
+  // violatingResources: ValidationViolatingResource[] | ConcatArray<never>;
 }
