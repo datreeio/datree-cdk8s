@@ -1,6 +1,6 @@
 const axios = require('axios').default;
 const fs = require('fs');
-const { pipeline } = require('stream/promises');
+const { pipeline } = require('stream');
 const extract = require('extract-zip');
 const pjson = require('./package.json');
 
