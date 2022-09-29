@@ -74,9 +74,16 @@ async function downloadFile(url, targetFile) {
   });
 
   const writeStream = fs.createWriteStream(`./${targetFile}`);
-  await pipeline(response.data, writeStream);
-
-  return response.status;
+  const downloadResult = await new Promise((resolve, reject) => {
+    pipeline(response.data, writeStream, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(response.status);
+      }
+    });
+  });
+  return downloadResult;
 }
 
 async function unzipDatreeInDir() {
