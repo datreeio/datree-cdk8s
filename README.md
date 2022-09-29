@@ -30,7 +30,7 @@ app: ts-node main.ts
 validations:
   - package: @datreeio/datree-cdk8s
     class: DatreeValidation
-    version: 0.0.1
+    version: 1.3.1
     properties:
        - policy: cdk8s
 ```
