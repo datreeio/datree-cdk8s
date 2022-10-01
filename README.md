@@ -32,7 +32,7 @@ validations:
     class: DatreeValidation
     version: 1.3.1
     properties:
-       - policy: cdk8s
+      policy: cdk8s
 ```
 
 ## Customization
