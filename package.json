@@ -40,9 +40,6 @@
     "type": "git",
     "url": "https://github.com/datreeio/datree-cdk8s.git"
   },
-  "publishConfig": {
-    "access": "restricted"
-  },
   "release": {
     "branches": [
       "main"
