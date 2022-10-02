@@ -28,7 +28,7 @@ To use this plugin, your configuration file should look like this:
 language: typescript
 app: ts-node main.ts
 validations:
-  - package: @datreeio/datree-cdk8s
+  - package: '@datreeio/datree-cdk8s'
     class: DatreeValidation
     version: 1.3.4
     properties:
