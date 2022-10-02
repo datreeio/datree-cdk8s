@@ -69,7 +69,9 @@ export class DatreeValidation implements Validation {
         stdio: 'pipe',
       });
 
-      if (status === 2) {
+      if (status === 0) {
+        context.logger.log(`🌳 Datree validation passed for ${manifest}`);
+      } else if (status === 2) {
         output.forEach((o: string | null) => {
           try {
             if (!!o) {
@@ -97,12 +99,13 @@ export class DatreeValidation implements Validation {
             }
           } catch (error) {
             context.logger.log(`🌳 Datree validation failed: ${error}`);
+            throw error;
           }
         });
       } else {
         let errorString = output.toString();
         errorString = errorString.replace(/[\n\r]+/g, ' ');
-        throw new Error(errorString.trim().substring(1).slice(0, -1));
+        throw new Error("Execution of datree failed: " + errorString.trim().substring(1).slice(0, -1));
       }
     }
 
