@@ -105,7 +105,10 @@ export class DatreeValidation implements Validation {
       } else {
         let errorString = output.toString();
         errorString = errorString.replace(/[\n\r]+/g, ' ');
-        throw new Error("Execution of datree failed: " + errorString.trim().substring(1).slice(0, -1));
+        throw new Error(
+          'Execution of Datree failed -' +
+            errorString.trim().substring(1).slice(0, -1)
+        );
       }
     }
 
