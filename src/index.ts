@@ -2,12 +2,12 @@ import { sync } from 'cross-spawn';
 import fs from 'fs';
 import path from 'path';
 
-// import type {
-//   Validation,
-//   ValidationContext,
-//   ValidationViolatingResource,
-//   ValidationViolation,
-// } from 'cdk8s-cli/lib/plugins';
+import type {
+  Validation,
+  ValidationContext,
+  ValidationViolatingResource,
+  ValidationViolation,
+} from 'cdk8s-cli/lib/plugins';
 
 import {
   DatreeRawJsonOutputType,
@@ -25,11 +25,9 @@ export type DatreeAddViolation = {
   readonly ruleName: string;
   readonly recommendation: string;
   readonly fix: string;
-  readonly violatingResources: any[];
-  // readonly violatingResources: ValidationViolatingResource[];
+  readonly violatingResources: ValidationViolatingResource[];
 };
-// implements Validation
-export class DatreeValidation {
+export class DatreeValidation implements Validation {
   private readonly props: DatreeValidationProps;
   private policy: string = 'cdk8s';
   private loginUrl: string = 'https://app.datree.io/login';
@@ -41,7 +39,7 @@ export class DatreeValidation {
     }
   }
 
-  public async validate(context: any) {
+  public async validate(context: ValidationContext) {
     const policyValidationResult: Map<string, ViolationType[]> = new Map();
 
     const binFilePath = path.resolve(__dirname, '..', 'bin', 'datree');
@@ -112,8 +110,7 @@ export class DatreeValidation {
       const violationsMap: Map<string, PrepViolationType[]> = new Map();
       policyValidationResult.forEach((violations: any) => {
         violations.forEach((violation: any) => {
-          // const violatingResources: ValidationViolatingResource[] = [];
-          const violatingResources: any[] = [];
+          const violatingResources: ValidationViolatingResource[] = [];
           const fileName = violation.fileName;
           const ruleName = violation.ruleName;
           violation.occurrences.forEach((occurrence: OccurrencesDetail) => {
@@ -160,7 +157,7 @@ export class DatreeValidation {
           recommendation: e[0].recommendation,
           fix: e[0].fix,
           violatingResources: mergeViolatingResources,
-        } as any); //as ValidationViolation
+        } as ValidationViolation);
       });
     }
 
